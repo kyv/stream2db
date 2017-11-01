@@ -33,18 +33,23 @@ You can set some options on the commandline.
     --db INDEX|DB            Name of the index (elastic) or database (mongo) where data is written
     --type TYPE|COLLECTION   Mapping type (elastic) or collection (mongo).
     --id ID                  Specify a field to be used as _id. If hash is specified the object hash will be used
-    --uris URIS              Space seperated list of urls to stream
+    --uris URIS              Space separated list of urls to stream
     --host HOST              Host to stream to. Default is localhost
     --port PORT              Port to stream to. Defaults to 9500 (elastic) or 27017 (mongo)
+    --converter JAVASCRIPT MODULE   Pass data trough some predefined conversion function
     --help                   Print this usage guide.
 
 ## Debugging
 
 The `--verbose` flag triggers debugging mode of the DB driver. En elasticsearch this is set to `log: trace`. The mongo driver allows for configuration by way of [variables in the enviornment](https://automattic.github.io/monk/docs/Debugging.html).
 
+## conversion
+
+You can add arbitrary data conversion using by exporting a default function from some file in the `converters` directory and passing the name of that file with the option `--converter`. A conversion to OCDS has been added as an example. To use it you would add `--converter ocds` to your commandline.
+
 ## Notes
 
-As we are targeting local data managment, we have not yet added DB authorization. This will get added to the parameters.
+As we are targeting local data management, we have not yet added DB authorization. This will get added to the parameters.
 
 ## Cleanup
 
