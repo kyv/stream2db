@@ -2,23 +2,21 @@ FROM mhart/alpine-node:8
 MAINTAINER Kevin Brown <kevin@rindecuentas.org>
 
 ENV NODE_ENV=production
+ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+ENV PATH "$PATH:/home/node/.npm-global/bin"
 
-RUN apk --no-cache add tini \
+RUN apk --no-cache add tini git bash \
   && addgroup -S node \
   && adduser -S -G node node
 
-WORKDIR /src
+WORKDIR /home/node
+
+USER node
 
 COPY package.json .
 
 COPY . .
 
-RUN chown -R node:node /src
-
-EXPOSE $PORT
-
-USER node
-RUN npm install -g --silent .
+RUN npm install -g .
 
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["./bin/updateProduction.sh"]
