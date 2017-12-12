@@ -6,7 +6,7 @@ backends could be added easily using the [node etl driver](https://github.com/ZJ
 
 ## install
 
-    npm install -g git+ssh://git@github.com:tomatl/stream2db.git
+    npm install -g git+https://git@github.com:tomatl/stream2db.git
 
 ## Examples
 
