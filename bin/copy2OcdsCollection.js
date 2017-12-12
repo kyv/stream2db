@@ -12,7 +12,7 @@ const ProgressBar = require('progress');
 const date = new Date();
 
 const indexes = Promise.all([
-  compranet.createIndex('body.NUMERO_PROCEDIMIENTO'),
+  compranet.createIndex('NUMERO_PROCEDIMIENTO'),
   ocds.createIndex('ocid'),
 ]);
 
@@ -34,16 +34,10 @@ function ocdsUpdater(first, last) {
   };
 }
 
-db.then(() => {
-  process.stdout.write(`Connected to mongodb server @${date}\n`);
-  return ocds.remove({});
-}).then(result => {
-  process.stdout.write(`removed ${result.result.n} documents from ocds\n`);
-  return indexes;
-}).then(() => {
+db.then(() => (indexes)).then(() => {
   process.stdout.write('indexes built\n');
   return compranet.count({
-    'body.NUMERO_PROCEDIMIENTO': { $exists: true, $ne: null },
+    NUMERO_PROCEDIMIENTO: { $exists: true, $ne: null },
   });
 }).then(docCount => {
   process.stdout.write(`${docCount} Documents\n`);
@@ -54,10 +48,12 @@ db.then(() => {
   console.time('duration');
 
   return compranet.find({
-    'body.NUMERO_PROCEDIMIENTO': { $exists: true, $ne: null },
+    NUMERO_PROCEDIMIENTO: { $exists: true, $ne: null },
   }).each(doc => {
-    const release = new Release({ cnetDocument: doc.body }).release;
-    const OCID = nP2Ocid(doc.body.NUMERO_PROCEDIMIENTO);
+    const release = new Release({ cnetDocument: doc }).release;
+    const OCID = nP2Ocid(doc.NUMERO_PROCEDIMIENTO);
+
+    // console.log(doc)
 
     ocds.findOne({ ocid: OCID })
       .then(ocdsDoc => {
@@ -72,26 +68,37 @@ db.then(() => {
               // but the hash so we don't reimprt the same Documents
               // on the next run. Since we are filtering by NUMERO_PROCEDIMIENTO,
               // those `just hash docs` won't get touched in the future
-              compranet.update({ _id: doc._id }, { _id: doc.hash }).then(res => {
-                console.log(res);
-              });
+              compranet.update({
+                _id: doc._id,
+                // filter buy NUMERO_PROCEDIMIENTO so that if the document
+                // is already just a hash we don't dont touch it anymore
+                NUMERO_PROCEDIMIENTO: doc.NUMERO_PROCEDIMIENTO,
+              }, { _id: doc._id })
+                .then(() => {
+                  --docCount;
+                  if (docCount === 0) {
+                    console.timeEnd('duration');
+                    db.close();
+                  }
+                });
+
+            });
+        }
+        // if new process, insert
+        return ocds.insert(release).then(() => {
+          compranet.update({
+            _id: doc._id,
+            // filter buy NUMERO_PROCEDIMIENTO so that if the document
+            // is already just a hash we don't dont touch it anymore
+            NUMERO_PROCEDIMIENTO: doc.NUMERO_PROCEDIMIENTO,
+          }, { _id: doc._id })
+            .then(() => {
               --docCount;
               if (docCount === 0) {
                 console.timeEnd('duration');
                 db.close();
               }
             });
-        }
-        // if new process, insert
-        return ocds.insert(release).then(() => {
-          compranet.update({ _id: doc._id }, { _id: doc.hash }).then(res => {
-            console.log(res);
-          });
-          --docCount;
-          if (docCount === 0) {
-            console.timeEnd('duration');
-            db.close();
-          }
         });
       });
   });
