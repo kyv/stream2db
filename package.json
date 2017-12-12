@@ -6,8 +6,8 @@
   "preferGlobal": "true",
   "bin": {
     "stream2db": "bin/app.js",
-    "cnet2Collection": "bin/updateProduction.sh",
-    "cnetCollection2Ocds": "bin/copy2OcdsCollection.js"
+    "cnet2Collection": "bin/cnet2Collection.sh",
+    "cnetCollection2Ocds": "bin/cnetCollection2Ocds.js"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha test/*.js",
