@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* eslint no-console: ["error", { allow: ["time", "timeEnd"] }] */
 const DBURI = process.env.MONGODB_URI;
 const db = require('monk')(DBURI);
@@ -9,7 +10,6 @@ const ocds = db.get('ocds', {
   castIds: false,
 });
 const ProgressBar = require('progress');
-const date = new Date();
 
 const indexes = Promise.all([
   compranet.createIndex('NUMERO_PROCEDIMIENTO'),
@@ -22,7 +22,7 @@ function nP2Ocid(string) {
 }
 
 function ocdsUpdater(first, last) {
-  // FIXME may be other info available in some docs but
+  // FIXME other info may be available in some docs but
   // not others. for example `buyer` object
   return {
     $addToSet: {
@@ -53,8 +53,6 @@ db.then(() => (indexes)).then(() => {
     const release = new Release({ cnetDocument: doc }).release;
     const OCID = nP2Ocid(doc.NUMERO_PROCEDIMIENTO);
 
-    // console.log(doc)
-
     ocds.findOne({ ocid: OCID })
       .then(ocdsDoc => {
         bar.tick();
@@ -64,10 +62,8 @@ db.then(() => (indexes)).then(() => {
 
           return ocds.update({ ocid: OCID }, modifier)
             .then(() => {
-              // FIXME instead of remove, remove all the data
-              // but the hash so we don't reimprt the same Documents
-              // on the next run. Since we are filtering by NUMERO_PROCEDIMIENTO,
-              // those `just hash docs` won't get touched in the future
+              // remove all data execept the _id/hash
+              // forcing future updates to skip duplicates
               compranet.update({
                 _id: doc._id,
                 // filter buy NUMERO_PROCEDIMIENTO so that if the document
@@ -86,6 +82,8 @@ db.then(() => (indexes)).then(() => {
         }
         // if new process, insert
         return ocds.insert(release).then(() => {
+          // remove all data execept the _id/hash
+          // forcing future updates to skip duplicates
           compranet.update({
             _id: doc._id,
             // filter buy NUMERO_PROCEDIMIENTO so that if the document
