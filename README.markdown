@@ -66,3 +66,7 @@ We do very simple type coercion. Numbers should work. Anything else you want to 
 ### Hashes
 
 We add the field `hash` to the indexed document. You can use it however you like.
+
+### k8s
+
+We produce [a docker image](https://hub.docker.com/r/poder/stream2db/) which you can use with the *CronJob.yaml files found here to run this code as a cronJob on kubernetes.
