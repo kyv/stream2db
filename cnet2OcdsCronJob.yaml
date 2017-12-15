@@ -10,7 +10,7 @@ spec:
         spec:
           containers:
           - name: stream2db
-            image: poder/stream2db:0.2.3
+            image: poder/stream2db:0.2.4
             args:
             - cnetCollection2Ocds
             env:

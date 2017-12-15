@@ -1,6 +1,6 @@
 {
   "name": "stream2db",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "from json to elastic search index",
   "main": "app.js",
   "preferGlobal": "true",
