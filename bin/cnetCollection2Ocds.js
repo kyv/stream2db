@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /* eslint no-console: ["error", { allow: ["time", "timeEnd"] }] */
+/* eslint no-process-exit: 0*/
 const DBURI = process.env.MONGODB_URI;
 const db = require('monk')(DBURI);
 const Release = require('cnet2ocds');
@@ -41,6 +42,11 @@ db.then(() => (indexes)).then(() => {
   });
 }).then(docCount => {
   process.stdout.write(`${docCount} Documents\n`);
+  if (docCount < 1) {
+    process.stdout.write('Nothing to do. Exiting...\n');
+    db.close();
+    process.exit(0);
+  }
   const bar = new ProgressBar('[:bar] :percent :etas', {
     total: docCount,
   });
