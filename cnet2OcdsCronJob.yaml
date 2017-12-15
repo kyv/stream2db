@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: cnet-to-ocds
 spec:
-  schedule: "15 09 * * *"
+  schedule: "15 */7 * * *"
   jobTemplate:
     spec:
       template:
