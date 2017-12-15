@@ -1,8 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 BACKEND=mongo
-TIMESTAMP=$(date "+%s")
-DATABASE="compranet-intermediary"
 PROXY_URL="https://excel2json.herokuapp.com"
 
 URLS=(
@@ -20,10 +18,9 @@ unset IFS
 
 for url in "${SORTED_URLS[@]}";
 do
-  echo "streaming ${PROXY_URL}/${url} to ${BACKEND}"
+  printf "streaming ${PROXY_URL}/${url} to ${BACKEND}\n"
   stream2db --backend ${BACKEND} \
     --id hash \
-    --db ${DATABASE} \
     --type compranet \
     ${PROXY_URL}/${url}
 done
