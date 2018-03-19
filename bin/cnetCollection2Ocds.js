@@ -35,6 +35,17 @@ function ocdsUpdater(first, last) {
   };
 }
 
+function removeDataFromCnetDocument(doc) {
+  // remove all data execept the _id/hash
+  // forcing future updates to skip duplicates
+  return compranet.update({
+    _id: doc._id,
+    // filter buy NUMERO_PROCEDIMIENTO so that if the document
+    // is already just a hash we don't dont touch it anymore
+    NUMERO_PROCEDIMIENTO: doc.NUMERO_PROCEDIMIENTO,
+  }, { _id: doc._id });
+}
+
 db.then(() => (indexes)).then(() => {
   process.stdout.write('indexes built\n');
   return compranet.count({
@@ -68,14 +79,7 @@ db.then(() => (indexes)).then(() => {
 
           return ocds.update({ ocid: OCID }, modifier)
             .then(() => {
-              // remove all data execept the _id/hash
-              // forcing future updates to skip duplicates
-              compranet.update({
-                _id: doc._id,
-                // filter buy NUMERO_PROCEDIMIENTO so that if the document
-                // is already just a hash we don't dont touch it anymore
-                NUMERO_PROCEDIMIENTO: doc.NUMERO_PROCEDIMIENTO,
-              }, { _id: doc._id })
+              removeDataFromCnetDocument(doc)
                 .then(() => {
                   --docCount;
                   if (docCount === 0) {
@@ -90,12 +94,7 @@ db.then(() => (indexes)).then(() => {
         return ocds.insert(release).then(() => {
           // remove all data execept the _id/hash
           // forcing future updates to skip duplicates
-          compranet.update({
-            _id: doc._id,
-            // filter buy NUMERO_PROCEDIMIENTO so that if the document
-            // is already just a hash we don't dont touch it anymore
-            NUMERO_PROCEDIMIENTO: doc.NUMERO_PROCEDIMIENTO,
-          }, { _id: doc._id })
+          removeDataFromCnetDocument(doc)
             .then(() => {
               --docCount;
               if (docCount === 0) {
