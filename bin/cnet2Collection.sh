@@ -4,12 +4,10 @@ BACKEND=mongo
 PROXY_URL="https://excel2json.herokuapp.com"
 
 URLS=(
+  https://upcp.funcionpublica.gob.mx/descargas/Contratos2018.zip
   https://upcp.funcionpublica.gob.mx/descargas/Contratos2017.zip
   https://upcp.funcionpublica.gob.mx/descargas/Contratos2016.zip
   https://upcp.funcionpublica.gob.mx/descargas/Contratos2015.zip
-  https://compranetinfo.funcionpublica.gob.mx/descargas/cnet/Contratos2014.zip
-  https://compranetinfo.funcionpublica.gob.mx/descargas/cnet/Contratos2013.zip
-  https://compranetinfo.funcionpublica.gob.mx/descargas/cnet/Contratos2010_2012.zip
 )
 
 # randomize list to increase likely hood of importing new documents on reruns
