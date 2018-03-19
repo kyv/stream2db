@@ -15,7 +15,7 @@ USER node
 
 COPY package.json .
 
-COPY . .
+COPY --chown=node . .
 
 RUN npm install -g .
 
