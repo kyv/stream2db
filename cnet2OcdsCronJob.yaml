@@ -21,4 +21,4 @@ spec:
                   name: mongodburi
             - name: "NODE_ENV"
               value: "production"
-          restartPolicy: OnFailure
+          restartPolicy: Never
